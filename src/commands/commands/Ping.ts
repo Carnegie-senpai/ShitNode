@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { Command } from "./Command";
+import { Command } from "../Command";
 
 export class Ping implements Command {
 	key = "ping";
@@ -7,5 +7,4 @@ export class Ping implements Command {
 	async cmd(msg: Message) {
 		await msg.reply("pong")
 	}
-
 }
