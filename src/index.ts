@@ -15,7 +15,7 @@ async function startup() {
 	client.on("messageCreate", (message) => {
 		console.log("Recieved message")
 		console.log(message.content)
-		if (Commands.isCommand(message)) {
+		if (message.author.id != client?.user?.id && Commands.isCommand(message)) {
 			const command = Commands.getCommand(message)
 			if (command) {
 				command(message).catch((reason)=>{
