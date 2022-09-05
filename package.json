@@ -1,8 +1,14 @@
 {
   "name": "shitnode",
-  "module": "index.ts",
-  "type": "module",
+  "module": "lib/index.js",
+  "type": "commonjs",
+  "dependencies": {
+	"discord.js": "14.3.0"
+  },
   "devDependencies": {
     "bun-types": "^0.1.0"
+  },
+  "scripts": {
+	"start": "node lib/index.js" 
   }
 }
