@@ -1,8 +1,8 @@
 import { readFileSync } from "fs";
-import { Client, Message } from "discord.js";
+import { Client, Message, GatewayIntentsString } from "discord.js";
 import { Commands } from "./commands/Commands"
 
-const client: Client = new Client({ intents: "MessageContent" })
+const client: Client = new Client({ intents: ["DirectMessageReactions", "DirectMessageTyping", "DirectMessages", "GuildBans", "GuildEmojisAndStickers", "GuildIntegrations", "GuildInvites", "GuildMembers", "GuildMessageReactions", "GuildMessageTyping", "GuildMessages", "GuildPresences", "GuildScheduledEvents", "GuildVoiceStates", "GuildWebhooks", "Guilds", "MessageContent"]  })
 
 
 async function startup() {
@@ -12,7 +12,9 @@ async function startup() {
 	  });	  
 	await client.login(token);
 	Commands.loadCommands();
-	client.on("", (message) => {
+	client.on("messageCreate", (message) => {
+		console.log("Recieved message")
+		console.log(message.content)
 		if (Commands.isCommand(message)) {
 			const command = Commands.getCommand(message)
 			if (command) {
