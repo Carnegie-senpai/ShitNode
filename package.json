@@ -11,6 +11,6 @@
     "@types/node-schedule": "2.1.0"
   },
   "scripts": {
-	"start": "node lib/index.js" 
+	"start": "node -e 'require(\"./lib/index.js\").startup()'" 
   }
 }

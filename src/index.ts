@@ -7,7 +7,7 @@ import { scheduleJob, RecurrenceRule } from "node-schedule";
 const client: Client = new Client({ intents: ["DirectMessageReactions", "DirectMessageTyping", "DirectMessages", "GuildBans", "GuildEmojisAndStickers", "GuildIntegrations", "GuildInvites", "GuildMembers", "GuildMessageReactions", "GuildMessageTyping", "GuildMessages", "GuildPresences", "GuildScheduledEvents", "GuildVoiceStates", "GuildWebhooks", "Guilds", "MessageContent"] });
 
 
-async function startup() {
+export async function startup() {
 	const token = readFileSync("./assets/token").toString();
 	client.on('ready', () => {
 		console.log(`Logged in as ${client?.user?.tag}!`);
@@ -39,7 +39,7 @@ async function startup() {
 		}
 	});
 
-	client.on("messageCreate", (message) => {
+	client.on("messageCreate", async (message) => {
 		// Special shutdown handling to allow cancellation of jobs
 		if (message.content === "uwu shutdown" && message.author.id === "236949806386380801") {
 			client.destroy();
@@ -52,16 +52,12 @@ async function startup() {
 			console.log(`${message?.author?.tag}: "${message?.content}"`);
 
 			// Process events
-			EventUtil.triggerAllMatchingEvents(message);
+			await EventUtil.triggerAllMatchingEvents(message);
 
 			// Process commands
-			CommandUtil.callCommandIfCommand(message);
+			await CommandUtil.callCommandIfCommand(message);
 		}
 	});
 
 
 }
-
-
-
-startup();

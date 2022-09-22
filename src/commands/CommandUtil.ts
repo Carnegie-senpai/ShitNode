@@ -62,8 +62,9 @@ export class CommandUtil {
 
 			try {
 				await CommandUtil.commands[messageArray[1]](msg)
-			} catch (e) {
-				await msg.reply(`There was an error while executing this command`)
+			} catch (e: any) {
+				console.log("Caught error while executing command", e)
+				await msg.reply(`There was an error while executing this command: + ${e.message}`)
 			}
 
 		}	
