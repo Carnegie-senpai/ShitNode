@@ -3,7 +3,9 @@ import { Event } from "../Event";
 
 
 export class Actually implements Event {
-	trigger: RegExp = /.*actually/gi;
+	async trigger(msg: Message) {
+		return msg.content.match(/.*actually/gi) !== null;
+	} 
 	async event(msg: Message) {
 		await msg.reply("Who's Ashley?")
 	}

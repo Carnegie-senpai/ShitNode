@@ -48,7 +48,7 @@ export async function startup() {
 
 	client.on("messageReactionAdd", async (reaction, user) => {
 		if (
-			reaction.message.author?.id === client.user?.id && // Message being reacted to is shit-chan's
+			// reaction.message.author?.id === client.user?.id && // Message being reacted to is shit-chan's
 			reaction.message.content === "Blaze it" && // Message text it Blaze it
 			reaction.emoji.name === "🔥" && // Emoji is 🔥
 			!user.bot && // User is not a bot
@@ -79,10 +79,10 @@ export async function startup() {
 			console.log(`${message?.author?.tag}: "${message?.content}"`);
 
 			// Process events
-			await EventUtil.triggerAllMatchingEvents(message);
+			EventUtil.triggerAllMatchingEvents(message);
 
 			// Process commands
-			await CommandUtil.callCommandIfCommand(message);
+			CommandUtil.callCommandIfCommand(message);
 		}
 	});
 

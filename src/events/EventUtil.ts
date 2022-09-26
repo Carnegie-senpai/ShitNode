@@ -22,10 +22,9 @@ export class EventUtil {
 	 */
 	static async triggerAllMatchingEvents(msg: Message) {
 		for (const event of EventUtil.events) {
-			let result = msg.content.match(event.trigger)
-			if (result) {
+			if (await event.trigger(msg)) {
 				try {
-					await event.event(msg);
+					event.event(msg);
 				} catch (e: any) {
 					console.error("Caught error while executing event", e)
 					await msg.reply(`There was an error while executing this event: ${e.message}`)

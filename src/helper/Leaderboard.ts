@@ -23,6 +23,15 @@ export class Leaderboard {
 		}
 	}
 
+	static getFirst() {
+		let sortedUsers = Object.keys(Leaderboard.cache).sort((user1, user2)=>{
+			return Leaderboard.cache[user1] - Leaderboard.cache[user2]
+		});
+		if (sortedUsers.length > 0)
+			return sortedUsers[sortedUsers.length - 1];
+		return null;
+	}
+
 	/**
 	 * 
 	 * @returns top 5 on leaderboard as a string
@@ -31,7 +40,7 @@ export class Leaderboard {
 		let str = "  ===> Leader Board <===  "
 		let top5 = Object.keys(Leaderboard.cache).sort((user1, user2)=>{
 			return Leaderboard.cache[user1] - Leaderboard.cache[user2]
-		});
+		}).reverse();
 
 		if (top5.length > 5)
 			top5 = top5.slice(0,5);

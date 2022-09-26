@@ -2,7 +2,10 @@ import { Message } from "discord.js";
 import { Event } from "../Event";
 
 export class Yeah implements Event {
-	trigger: RegExp = /(yeah. sure)|(yea. sure)/gi;
+	async trigger(msg: Message) {
+		return msg.content.match(/(yeah. sure)|(yea. sure)/gi) !== null;
+	}
+
 	async event(msg: Message<boolean>): Promise<void> {
 		await msg.reply("Who's Yassur?");
 	};
