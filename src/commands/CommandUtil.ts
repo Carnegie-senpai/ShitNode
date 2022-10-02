@@ -1,5 +1,6 @@
 import * as commands from "./index";
 import { Message } from "discord.js";
+import { REST, Routes } from "discord.js";
 export class CommandUtil {
 	static commands: { [name: string]: (msg: Message) => Promise<void> } = CommandUtil.loadCommands();
 
@@ -70,3 +71,4 @@ export class CommandUtil {
 		}	
 	}
 }
+
