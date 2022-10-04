@@ -1,7 +1,41 @@
 import ytdl from "ytdl-core";
-import { createWriteStream} from "fs"
+import ytsr from "ytsr";
 
-export function stream(url: string) {
-	let stream = ytdl(url, {filter: "audioonly", quality: "highestaudio"});
-	return stream
+export interface Video {
+	name: string;
+	url: string;
+}
+
+export function stream(video: Video) {
+	return ytdl(video.url, { filter: "audioonly", quality: "highestaudio" });
+	
+}
+
+export async function getVideo(input: string): Promise<Video> {
+	if (input.includes("https://")) {
+		const info = await ytdl.getBasicInfo(input)
+		return {
+			name: info.videoDetails.title,
+			url: input
+		}
+	}
+
+	const search = await ytsr(input, {limit: 10});
+	let resolvedUrl = "";
+	let resolvedName = "";
+	for (let result of search.items) {
+		if (result.type == "video") {
+			resolvedUrl = result.url;
+			resolvedName = result.title;
+			break;
+		}
+	}
+
+	if (!resolvedUrl || !resolvedName)
+		throw new Error(`Could not find a video for input: ${input}`)
+	
+	return {
+		name: resolvedName,
+		url :resolvedUrl
+	}
 }
