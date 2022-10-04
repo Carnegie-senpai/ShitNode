@@ -6,6 +6,8 @@ import { Play } from "./Play";
 
 export class Queue implements Command {
 	key: string = "queue";
+	help = "`uwu queue`: Command is used to display the current queue to be played\n \
+			`uwu queue <NUMBER>`: Command is used to remove an entry from the queue at the given index"
 	async cmd(msg: Message) {
 		const content = CommandUtil.getContent(msg);
 		if (content == "") {

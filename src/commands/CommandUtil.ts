@@ -1,8 +1,9 @@
 import * as commands from "./index";
 import { Message } from "discord.js";
-import { REST, Routes } from "discord.js";
+import { Command } from "./Command";
+
 export class CommandUtil {
-	static commands: { [name: string]: (msg: Message) => Promise<void> } = CommandUtil.loadCommands();
+	static commands: { [name: string]: Command } = CommandUtil.loadCommands();
 
 	/**
 	 * Returns an object containing all commands
@@ -11,7 +12,7 @@ export class CommandUtil {
 		let allCommands = {}
 		Object.values(commands).forEach((command) => {
 			const commandInstance = new command()
-			allCommands[commandInstance.key] = commandInstance.cmd
+			allCommands[commandInstance.key] = commandInstance
 		})
 		return allCommands
 	}
@@ -62,7 +63,7 @@ export class CommandUtil {
 			}
 
 			try {
-				await CommandUtil.commands[messageArray[1]](msg)
+				await CommandUtil.commands[messageArray[1]].cmd(msg)
 			} catch (e: any) {
 				console.log("Caught error while executing command", e)
 				await msg.reply(`There was an error while executing this command: + ${e.message}`)

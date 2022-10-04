@@ -9,6 +9,7 @@ import { joinVoiceChannel, AudioPlayer, createAudioResource, createAudioPlayer, 
 
 export class Play implements Command {
 	key = "play";
+	help = "`uwu play <VIDEO>`: When provided with a valid youtube url or search term it will begin to play the video. If a video is already being played it will be added to the queue instead"
 	static audioPlayer: AudioPlayer | null = null;
 	static connection: VoiceConnection | null = null;
 	static queue: Video[] = [];
