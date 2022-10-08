@@ -20,6 +20,7 @@ export class Play implements Command {
 		// Create player if it does not exist. Only do this once
 		if (!Play.audioPlayer) {
 			Play.audioPlayer = createAudioPlayer();
+			
 			Play.audioPlayer.on("stateChange", async (oldState, newState) => {
 				if (newState.status === AudioPlayerStatus.Idle && Play.audioPlayer) {
 					if (Play.queue.length > 0) {
@@ -32,6 +33,21 @@ export class Play implements Command {
 						Play.disconnect();
 					}
 
+				}
+			});
+
+			Play.audioPlayer.on("error", (error) => {
+				console.error(error);
+				try {
+					Play.queue = [];
+					Play.audioPlayer?.stop(true);
+				} catch (e) {
+					console.error("Error stopping playback on error: ", e)
+				}
+				try {
+					Play.disconnect();
+				} catch (e) {
+					console.error("Error disconnecting from voice channel on error: ", e)
 				}
 			});
 		}

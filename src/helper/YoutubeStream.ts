@@ -7,7 +7,13 @@ export interface Video {
 }
 
 export function stream(video: Video) {
-	return ytdl(video.url, { filter: "audioonly", quality: "highestaudio" });
+	return ytdl(video.url, { 
+		filter: "audioonly", 
+		quality: "lowestaudio",
+		highWaterMark: 1 << 62,
+		liveBuffer: 1 << 62,
+		dlChunkSize: 0
+	});
 	
 }
 
