@@ -5,4 +5,5 @@ export { Play } from "./commands/Play";
 export { Queue } from "./commands/Queue";
 export { Stop } from "./commands/Stop";
 export { Help } from "./commands/Help";
+export { Skip } from "./commands/Skip";
 export { ShowLeaderboard } from "./commands/ShowLeaderboard";
