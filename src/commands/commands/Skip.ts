@@ -16,7 +16,7 @@ export class Skip implements Command {
 				const audioResource = createAudioResource(audioStream);
 				Play.audioPlayer.play(audioResource);
 			} else {
-				Play.audioPlayer.stop();
+				Play.audioPlayer.stop(true);
 				Play.disconnect();
 			}
 		}
