@@ -1,12 +1,13 @@
 import { Message } from "discord.js";
 import { Command } from "../Command";
-import { Guild } from "discord.js";
 import { stream, getVideo, Video } from "../../helper/YoutubeStream";
 import { CommandUtil } from "../CommandUtil";
 import { StaticClient } from "../../Client";
-
 import { joinVoiceChannel, AudioPlayer, createAudioResource, createAudioPlayer, VoiceConnection, AudioPlayerStatus } from "@discordjs/voice";
+import { Logger } from "../../Logger";
 
+// TODO better log in this command
+const playLog = new Logger("Play/Play")
 export class Play implements Command {
 	key = "play";
 	help = "`uwu play <VIDEO>`: When provided with a valid youtube url or search term it will begin to play the video. If a video is already being played it will be added to the queue instead"
@@ -20,12 +21,12 @@ export class Play implements Command {
 		// Create player if it does not exist. Only do this once
 		if (!Play.audioPlayer) {
 			Play.audioPlayer = createAudioPlayer();
-			
+
 			Play.audioPlayer.on("stateChange", async (oldState, newState) => {
 				if (newState.status === AudioPlayerStatus.Idle && Play.audioPlayer) {
 					if (Play.queue.length > 0) {
-						let nextSong = Play.queue.splice(0,1)[0];
-						console.log(`Playing ${nextSong.name}`)
+						let nextSong = Play.queue.splice(0, 1)[0];
+						playLog.log(`Playing ${nextSong.name}`)
 						const audioStream = stream(nextSong);
 						const audioResource = createAudioResource(audioStream);
 						Play.audioPlayer.play(audioResource);
@@ -37,17 +38,17 @@ export class Play implements Command {
 			});
 
 			Play.audioPlayer.on("error", (error) => {
-				console.error(error);
+				playLog.error("Error in audio player: ", error);
 				try {
 					Play.queue = [];
 					Play.audioPlayer?.stop(true);
 				} catch (e) {
-					console.error("Error stopping playback on error: ", e)
+					playLog.error("Error stopping playback on error: ", e)
 				}
 				try {
 					Play.disconnect();
 				} catch (e) {
-					console.error("Error disconnecting from voice channel on error: ", e)
+					playLog.error("Error disconnecting from voice channel on error: ", e)
 				}
 			});
 		}
@@ -56,9 +57,9 @@ export class Play implements Command {
 
 		// Queue up music if already playing a song
 		if (Play.audioPlayer.state.status != "idle") {
-			console.log("Already playing something", Play.audioPlayer.state.status);
+			playLog.log("Already playing something", Play.audioPlayer.state.status);
 			Play.queue.push(await getVideo(url));
-			console.log(Play.queue);
+			playLog.log("Queue: ", Play.queue);
 			return;
 		}
 
