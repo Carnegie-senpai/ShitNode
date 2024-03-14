@@ -1,0 +1,7 @@
+lib
+assets/leadboard.json
+node_modules
+.gitignore
+.nvmrc
+README.md
+shitnode.dockerfile

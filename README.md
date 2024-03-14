@@ -1,2 +1,32 @@
 # ShitNode
-Port the bot shit-chan to node.js and typescript
+Shit-chan is a bot that provides a few functionality, mostly comedic. It is built as a docker image and deployed via k3s (or k8s if you are a big boy)
+
+## Local dev setup
+### Prequisites:
+- Node v20
+- npm
+
+1. Install all dependencies
+```bash
+npm install
+```
+2. Build typescript -> javascript 
+```bash
+npm run build
+```
+3. Create token file
+```bash
+mkdir assets && touch assets/token
+```
+4. Use valid bot-token from (discord)[https://discord.com/developers/applications] and paste it into the token file
+
+## Running a docker build
+### Prerequisites:
+ - Must have podman or dockerdesktop or other equivalent docker implementation
+ - token file w/ valid token in assets directory
+Run the following command to produce an image:
+```bash
+podman build -t shitdocker -f ./shitnode.dockerfile
+```
+Troubleshooting:
+If build is failing though it seems it shouldn't you can try building w/o a cache by adding the `--no-cache` flag to ensure that it is a fresh build and a stale cash of one of the layers is not causing an issue
