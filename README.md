@@ -18,7 +18,7 @@ npm run build
 ```bash
 mkdir assets && touch assets/token
 ```
-4. Use valid bot-token from (discord)[https://discord.com/developers/applications] and paste it into the token file
+4. Use valid bot-token from [discord](https://discord.com/developers/applications) and paste it into the token file
 
 ## Running a docker build
 ### Prerequisites:
