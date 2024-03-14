@@ -28,5 +28,7 @@ Run the following command to produce an image:
 ```bash
 podman build -t shitdocker -f ./shitnode.dockerfile
 ```
-Troubleshooting:
+## Troubleshooting:
 If build is failing though it seems it shouldn't you can try building w/o a cache by adding the `--no-cache` flag to ensure that it is a fresh build and a stale cash of one of the layers is not causing an issue
+
+If the bot is failing to start ensure the token is created and valid
