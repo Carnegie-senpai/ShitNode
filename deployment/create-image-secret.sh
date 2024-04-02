@@ -1,6 +1,12 @@
 #!/bin/bash
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root"
+  exit 1
+fi
+
 read -p 'Username: ' uservar
 read -sp 'Password: ' passvar
+
 if [ "$uservar" == "" ]; then
     echo no username provided
     exit 1
