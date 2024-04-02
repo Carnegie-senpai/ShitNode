@@ -26,9 +26,20 @@ mkdir assets && touch assets/token
  - token file w/ valid token in assets directory
 Run the following command to produce an image:
 ```bash
-podman build -t shitdocker -f ./shitnode.dockerfile
+podman build -t shit-chan -f ./shit-chan.dockerfile
 ```
 ## Troubleshooting
 If build is failing though it seems it shouldn't you can try building w/o a cache by adding the `--no-cache` flag to ensure that it is a fresh build and a stale cash of one of the layers is not causing an issue
 
 If the bot is failing to start ensure the token is created and valid
+
+## Deploying the setup to k8s
+1. Create token file
+```bash
+mkdir assets && touch assets/token
+```
+2. Use valid bot-token from [discord](https://discord.com/developers/applications) and paste it into the token file
+3. Run the setup script k8s
+```bash
+cd deployment && ./create-deployment.sh
+```

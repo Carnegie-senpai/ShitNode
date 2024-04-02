@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shit-chan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shit-chan
+  template:
+    metadata:
+      labels:
+        app: shit-chan
+    spec:
+      containers:
+      - name: shit-chan-container
+        image:  grimblo/shit-chan:1.0.0
+        resources:
+          requests:
+            memory: "200Mi"
+          limits:
+            memory: "1.5Gi"
+        env:
+          - name: TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: discord-token
+                key: token

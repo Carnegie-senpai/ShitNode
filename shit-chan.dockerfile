@@ -4,6 +4,7 @@ FROM node:20-alpine
 RUN mkdir ShitNode
 COPY ./ /ShitNode
 WORKDIR /ShitNode 
+RUN mkdir assets
 # Install all dependencies
 RUN npm install
 # Build javascript files

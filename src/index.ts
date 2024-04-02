@@ -18,13 +18,12 @@ const messageLog = new Logger("index/message")
 
 export async function startup() {
 
-	let token;
-	try {
-		token = readFileSync("./assets/token").toString();
-	} catch (e) {
-		startupLog.error("Could not read token from assets: ", e)
-		throw new Error("Could not read token from assets")
+	const token = process?.env?.TOKEN
+	if (!token) {
+		startupLog.error("Token not present at startup")
+		throw new Error("Token not present at startup")
 	}
+
 	Leaderboard.load();
 
 	StaticClient.client.on('ready', () => {
