@@ -21,7 +21,10 @@ export class Logger {
         try {
             const now = moment().format("MM-DD-YYYY HH:mm:ss.SSS")
             const formattedMessage = `[${now}][${this.callerLocation}][info] ${message}`
-            console.info(formattedMessage, args)
+            if (args.length > 0)
+                console.info(formattedMessage, args)
+            else
+                console.info(formattedMessage)
         } catch (e) {
             console.error("Logger encountered an error, continuing: ", e)
         }
@@ -31,7 +34,10 @@ export class Logger {
         try {
             const now = moment().format("MM/DD/YYYY HH:mm:ss.SSS")
             const formattedMessage = `[${now}][${this.callerLocation}][warn] ${message}`
-            console.warn(formattedMessage, args)
+            if (args.length > 0)
+                console.warn(formattedMessage, args)
+            else
+                console.warn(formattedMessage)
         } catch (e) {
             console.error("Logger encountered an error, continuing: ", e)
         }
@@ -41,7 +47,10 @@ export class Logger {
         try {
             const now = moment().format("MM/DD/YYYY HH:mm:ss.SSS")
             const formattedMessage = `[${now}][${this.callerLocation}][error] ${message}`
-            console.error(formattedMessage, args)
+            if (args.length > 0)
+                console.error(formattedMessage, args)
+            else
+                console.error(formattedMessage)
         } catch (e) {
             console.error("Logger encountered an error, continuing: ", e)
         }

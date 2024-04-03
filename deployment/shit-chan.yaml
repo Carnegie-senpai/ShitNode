@@ -26,5 +26,7 @@ spec:
               secretKeyRef:
                 name: discord-token
                 key: token
+          - name: TZ
+            value: America/Los_Angeles
       imagePullSecrets:
         - name: regcred 
