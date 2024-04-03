@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: shit-chan-container
-        image:  grimblo/shit-chan:1.0.2
+        image:  grimblo/shit-chan:1.0.3
         resources:
           requests:
             memory: "200Mi"
