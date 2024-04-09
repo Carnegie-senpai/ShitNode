@@ -1,25 +1,9 @@
 import { AudioPlayer, AudioPlayerStatus, VoiceConnection, createAudioPlayer, createAudioResource, joinVoiceChannel } from "@discordjs/voice";
 import { Message } from "discord.js";
-import { StaticClient } from "../Client";
 import { CommandUtil } from "../commands/CommandUtil";
 import { Video, getVideo, stream } from "./YoutubeStream";
 import { Logger } from "../Logger";
-
-
-export enum PlayerInitializationStatus {
-    SUCCESS,
-    ALREADY_ALIVE,
-
-    // Connection Failures
-    NO_GUILD_ID,
-    NO_AUTHOR_ID,
-    NO_GUILD_IN_CACHE,
-    NO_MEMBER_IN_CACHE,
-    NO_VOICE_CHANNEL,
-
-    // Subscription Failures
-    COULD_NOT_SUBSCRIBE
-}
+import { User } from "./User";
 
 const playLogger = new Logger('Player/Player');
 export class Player {
@@ -27,45 +11,66 @@ export class Player {
     private static _audioPlayer: AudioPlayer = Player.createAudioPlayer();
     private static _connection: VoiceConnection | undefined = undefined;
 
+
+
+    /**
+     * Determines if user is valid to play audio and responds accordingly
+     * @param msg Message that provides the context for this command
+     * @param respond Whether to reply to the user with information about result
+     */
+    static async isValidUser(msg: Message, respond?: boolean): Promise<boolean> {
+        try {
+            const user = User.getUser(msg);
+
+            if (!user.member.voice.channel) {
+                playLogger.error("User was not in a voice channel");
+                if (respond)
+                    await msg.reply("You must be in a voice channel to control audio"); // Honestly this whoe respond concept is silly but it saves space
+                return false;
+            }
+
+            if (Player._connection && user.member.voice.channel.id !== Player._connection.joinConfig.channelId) {
+                if (respond)
+                    await msg.reply("You must be in the same voice channel as the bot to control audio");
+                return false;
+            }
+
+            return true;
+        } catch (e) {
+            playLogger.error("Error while checking if user is valid, returning invalid: ", e);
+            if (respond)
+                await msg.reply("Failed to initialize player");
+            return false;
+        }
+    }
+
     /**
      * Creates a player if that is necessary. Should be called at the beginning of any public functions to ensure that the player can play
-     * @param msg Message which provides context for this interaction with the player
+     * @param msg Message that provides the context for this command
+     * @param respond Whether to reply to the user with information about result
      */
-    static initAudio(msg: Message) {
-        if (!Player._connection) {
-            Player._queue = [];
-            if (!msg?.guildId)
-                return PlayerInitializationStatus.NO_GUILD_ID;
+    static async init(msg: Message, respond?: boolean) {
+        try {
+            if (!Player._connection) {
+                const user = User.getUserInVoice(msg);
+                Player._queue = [];
+                Player._connection = joinVoiceChannel({
+                    guildId: user.guild.id,
+                    channelId: user.vc.id,
+                    adapterCreator: user.guild.voiceAdapterCreator
+                });
 
-            if (!msg?.author?.id)
-                return PlayerInitializationStatus.NO_AUTHOR_ID;
-
-
-            const guild = StaticClient.client.guilds.cache.get(msg.guildId);
-            const member = guild?.members.cache.get(msg.author.id);
-            const vc = member?.voice.channel;
-
-            if (!guild)
-                return PlayerInitializationStatus.NO_GUILD_IN_CACHE;
-
-            if (!member)
-                return PlayerInitializationStatus.NO_MEMBER_IN_CACHE;
-
-            if (!vc)
-                return PlayerInitializationStatus.NO_VOICE_CHANNEL;
-
-            Player._connection = joinVoiceChannel({
-                guildId: guild.id,
-                channelId: vc.id,
-                adapterCreator: guild.voiceAdapterCreator
-            });
-
-            if (!Player._connection.subscribe(Player._audioPlayer))
-                return PlayerInitializationStatus.COULD_NOT_SUBSCRIBE;
-
-            return PlayerInitializationStatus.SUCCESS;
+                if (!Player._connection.subscribe(Player._audioPlayer)) {
+                    throw new Error("Could not subscribe to voice channel");
+                }
+            }
+        } catch (e) {
+            playLogger.error("Failed to init player, cleaning up: ", e);
+            if (respond)
+                await msg.reply("Failed to initialize player");
+            Player.kill();
+            throw e;
         }
-        return PlayerInitializationStatus.ALREADY_ALIVE;
     }
 
     private static createAudioPlayer() {
@@ -136,11 +141,11 @@ export class Player {
         for (let i = 0; i < Player._queue.length; i++) {
             response += `\n${i}: ${Player._queue[i].name}`;
         }
-        return response
+        return response;
     }
 
     static get queue() {
-        return Player._queue
+        return Player._queue;
     }
 
 
@@ -193,7 +198,7 @@ export class Player {
      * @returns @boolean
      */
     static isPlaying() {
-        return Player._connection && Player._audioPlayer.state.status !== AudioPlayerStatus.Idle;
+        return !!Player._connection && Player._audioPlayer.state.status !== AudioPlayerStatus.Idle;
     }
 
     /**

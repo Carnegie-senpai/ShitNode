@@ -1,11 +1,7 @@
 import { Message } from "discord.js";
 import { Command } from "../Command";
-import { stream, getVideo, Video } from "../../helper/YoutubeStream";
-import { CommandUtil } from "../CommandUtil";
-import { StaticClient } from "../../Client";
-import { joinVoiceChannel, AudioPlayer, createAudioResource, createAudioPlayer, VoiceConnection, AudioPlayerStatus } from "@discordjs/voice";
 import { Logger } from "../../Logger";
-import { Player, PlayerInitializationStatus } from "../../helper/Player";
+import { Player } from "../../helper/Player";
 
 // TODO better log in this command
 const playLog = new Logger("Play/Play");
@@ -23,27 +19,17 @@ export class Play implements Command {
 			return;
 		}
 
+		// Check if user is allowed to run this command
+		if (!await Player.isValidUser(msg, true))
+			return;
+
 		// Initialize the player
-		const initResult = Player.initAudio(msg);
-		switch (initResult) {
-			case PlayerInitializationStatus.SUCCESS:
-				break;
-			case PlayerInitializationStatus.ALREADY_ALIVE:
-				break;
-			case PlayerInitializationStatus.NO_VOICE_CHANNEL:
-				await msg.reply("You must be in a voice channel to play audio");
-				return;
-			default:
-				playLog.error(`Failed to iniitialize player, received status: ${initResult}`);
-				await msg.reply("Encountered an error initializing the player");
-				Player.kill()
-				return;
-		}
+		await Player.init(msg, true);
 
 		if (Player.isPlaying()) {
-			Player.pushQueue(video)
+			Player.pushQueue(video);
 		} else {
-			await Player.playVideo(video)
+			await Player.playVideo(video);
 		}
 	}
 }
