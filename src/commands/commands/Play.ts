@@ -27,9 +27,13 @@ export class Play implements Command {
 		await Player.init(msg, true);
 
 		if (Player.isPlaying()) {
+			playLog.info("Already playing a song, queuing song")
 			Player.pushQueue(video);
+			await msg.reply(`Queueing "${video.name}"`)
 		} else {
+			playLog.info(`Nothing playing, playing ${video.name}`)
 			await Player.playVideo(video);
+			await msg.reply(`Playing "${video.name}"`)
 		}
 	}
 }

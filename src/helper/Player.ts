@@ -4,13 +4,13 @@ import { CommandUtil } from "../commands/CommandUtil";
 import { Video, getVideo, stream } from "./YoutubeStream";
 import { Logger } from "../Logger";
 import { User } from "./User";
+import { sleep } from "./Sleep";
 
 const playLogger = new Logger('Player/Player');
 export class Player {
     private static _queue: Video[] = [];
     private static _audioPlayer: AudioPlayer = Player.createAudioPlayer();
     private static _connection: VoiceConnection | undefined = undefined;
-
 
 
     /**
@@ -83,9 +83,8 @@ export class Player {
                     Player.kill();
                     return;
                 }
-                playLogger.log(`Playing ${nextSong.name}`);
+                playLogger.log(`Song finished playing, automatically playing ${nextSong.name}`);
                 await Player.playVideo(nextSong);
-
             }
         });
 
@@ -148,7 +147,6 @@ export class Player {
         return Player._queue;
     }
 
-
     static async playVideo(video: Video) {
         if (Player.isPlaying()) {
             playLogger.warn(`Not playing video "${video.name}" because the player was already playing audio`);
@@ -156,18 +154,19 @@ export class Player {
         }
         const audioStream = stream(video);
         const audioResource = createAudioResource(audioStream);
+        // Delay may or may not help it start playing w/o audio issues
+        await sleep(200);
         Player._audioPlayer.play(audioResource);
     }
 
     static async skip() {
-        const nextSong = Player.popQueue();
-        if (!nextSong) {
+        if (Player.queue.length === 0) {
             Player.kill();
             return;
         }
         // Only stop playback of current video then move on to play popped song
         Player._audioPlayer.stop();
-        Player.playVideo(nextSong);
+        playLogger.info(`Skipped song, next song will be played when the audio becomes idle`);
     }
 
     /**

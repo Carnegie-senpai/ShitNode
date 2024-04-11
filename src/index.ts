@@ -17,7 +17,7 @@ const messageLog = new Logger("index/message")
 
 
 export async function startup() {
-
+	require('dotenv').config()
 	const token = process?.env?.TOKEN
 	if (!token) {
 		startupLog.error("Token not present at startup")
