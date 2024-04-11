@@ -14,8 +14,9 @@ spec:
     spec:
       volumes:
       - name: assets
-        hostPath: /home/nick/k8s/shit-chan
-        type: Directory
+        hostPath: 
+          path: /home/nick/k8s/shit-chan
+          type: Directory
       containers:
       - name: shit-chan-container
         image:  grimblo/shit-chan:1.0.3
