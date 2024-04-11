@@ -12,9 +12,15 @@ spec:
       labels:
         app: shit-chan
     spec:
+      volumes:
+      - name: assets
+        hostPath: /home/nick/k8s/shit-chan
+        type: Directory
       containers:
       - name: shit-chan-container
         image:  grimblo/shit-chan:1.0.3
+        volumeMounts:
+        - mountPath: /ShitNode/assets
         resources:
           requests:
             memory: "200Mi"
