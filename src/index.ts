@@ -1,5 +1,3 @@
-import { readFileSync } from "fs";
-import { Client } from "discord.js";
 import { CommandUtil } from "./commands/CommandUtil";
 import { EventUtil } from "./events/EventUtil";
 import { scheduleJob, RecurrenceRule } from "node-schedule";
