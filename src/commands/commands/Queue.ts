@@ -1,8 +1,8 @@
 import { Message } from "discord.js";
 import { Command } from "../Command";
 import { CommandUtil } from "../CommandUtil";
-import { Play } from "./Play";
 import { Logger } from "../../Logger"
+import { Player } from "../../helper/Player";
 
 const queueLog = new Logger("Queue/Queue")
 
@@ -14,20 +14,18 @@ export class Queue implements Command {
 		queueLog.info('Getting queue')
 		const content = CommandUtil.getContent(msg);
 		if (content == "") {
-			let response = "  ===> Queue <===  ";
-			for (let i = 0; i < Play.queue.length; i++) {
-				response += `\n${i}: ${Play.queue[i].name}`;
-			}
-			await msg.reply(response);
+			const queueContent = Player.printQueue()
+			await msg.reply(queueContent);
 		} else {
-			let index = parseInt(content);
-			if (Number.isNaN(index)) {
+			const index = parseInt(content);
+			if (Number.isNaN(index) || !Number.isInteger(index) || index < 0 || index >= Player.queue.length) {
 				await msg.reply(`"${content}" is not a valid index`);
 				return;
 			}
 				
-			let removed = Play.queue.splice(index, 1);
-			await msg.reply(`Removed "${removed[0].name}" from the queue`);
+			let removed = Player.removeFromQueue(index)
+			if (removed)
+				await msg.reply(`Removed "${removed.name}" from the queue`);
 		}
 	}
 }

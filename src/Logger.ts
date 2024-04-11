@@ -14,7 +14,7 @@ export class Logger {
     }
 
     log(message: string, ...args) {
-        this.info(message, args)
+        this.info(message, ...args)
     }
 
     info(message: string, ...args) {
@@ -22,7 +22,7 @@ export class Logger {
             const now = moment().format("MM-DD-YYYY HH:mm:ss.SSS")
             const formattedMessage = `[${now}][${this.callerLocation}][info] ${message}`
             if (args.length > 0)
-                console.info(formattedMessage, args)
+                console.info(formattedMessage, ...args)
             else
                 console.info(formattedMessage)
         } catch (e) {
@@ -35,7 +35,7 @@ export class Logger {
             const now = moment().format("MM/DD/YYYY HH:mm:ss.SSS")
             const formattedMessage = `[${now}][${this.callerLocation}][warn] ${message}`
             if (args.length > 0)
-                console.warn(formattedMessage, args)
+                console.warn(formattedMessage, ...args)
             else
                 console.warn(formattedMessage)
         } catch (e) {
@@ -48,7 +48,7 @@ export class Logger {
             const now = moment().format("MM/DD/YYYY HH:mm:ss.SSS")
             const formattedMessage = `[${now}][${this.callerLocation}][error] ${message}`
             if (args.length > 0)
-                console.error(formattedMessage, args)
+                console.error(formattedMessage, ...args)
             else
                 console.error(formattedMessage)
         } catch (e) {

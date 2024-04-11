@@ -1,5 +1,3 @@
-import { readFileSync } from "fs";
-import { Client } from "discord.js";
 import { CommandUtil } from "./commands/CommandUtil";
 import { EventUtil } from "./events/EventUtil";
 import { scheduleJob, RecurrenceRule } from "node-schedule";
@@ -17,7 +15,7 @@ const messageLog = new Logger("index/message")
 
 
 export async function startup() {
-
+	require('dotenv').config()
 	const token = process?.env?.TOKEN
 	if (!token) {
 		startupLog.error("Token not present at startup")
