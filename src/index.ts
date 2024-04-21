@@ -66,14 +66,21 @@ export async function startup() {
 	ScheduledJobCreator.scheduleJob("leaderboard", rule3, async () => {
 		scheduledLog.info("Checking if it is a new month");
 		if (Leaderboard.isNewMonth()) {
-			const winner = Leaderboard.getFirst();
-			Leaderboard.resetLeaderBoard();
-			const channel = StaticClient.client.channels.cache.get("236745934128676865");
-			if (channel?.isTextBased()) {
-				if (winner) {
-					await channel.send(`Congratulations to ${winner?.name} they won the blaze-it race this month with a final score of ${winner?.score}`);
-					await channel.send(Leaderboard.stringify());
+			try {
+				const winner = Leaderboard.getFirst();
+				const channel = StaticClient.client.channels.cache.get("236745934128676865");
+				if (channel?.isTextBased()) {
+					if (winner) {
+						await channel.send(`Congratulations to ${winner?.name} they won the blaze-it race this month with a final score of ${winner?.score}`);
+						await channel.send(Leaderboard.stringify());
+					}
 				}
+			}
+			catch (e) {
+				scheduledLog.error("Experienced an error reporting leaderboard winner, will still reset leaderboard: ", e);
+			}
+			finally {
+				Leaderboard.resetLeaderBoard();
 			}
 		}
 	});
