@@ -151,4 +151,5 @@ async function gracefulShutdown() {
 	shutdownLog.info("Performing a graceful shutdown");
 	ScheduledJobCreator.cancelJobs();
 	await StaticClient.client.destroy();
+	process.exit(0);
 }
