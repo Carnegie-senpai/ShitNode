@@ -19,7 +19,7 @@ spec:
           type: Directory
       containers:
       - name: shit-chan-container
-        image:  grimblo/shit-chan:1.0.4
+        image:  grimblo/shit-chan:1.0.5
         volumeMounts:
         - mountPath: /ShitNode/assets
           name: assets
