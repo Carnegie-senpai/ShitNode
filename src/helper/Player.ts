@@ -11,7 +11,7 @@ export class Player {
     private static _queue: Video[] = [];
     private static _audioPlayer: AudioPlayer = Player.createAudioPlayer();
     private static _connection: VoiceConnection | undefined = undefined;
-
+    private static playing: string = "";
 
     /**
      * Determines if user is valid to play audio and responds accordingly
@@ -136,9 +136,15 @@ export class Player {
      * Prints the contents of the queue as a human readable string. If the queue length
      */
     static printQueue(): string {
-        let response = "  ===> Queue <===  ";
-        for (let i = 0; i < Player._queue.length; i++) {
-            response += `\n${i}: ${Player._queue[i].name}`;
+        let response = "";
+        if (Player.playing != "") {
+            response += `  ===> Currently Playing <===  \n"${Player.playing}"\n`
+        }
+        if (Player._queue.length > 0) {
+            response = "  ===> Queue <===  ";
+            for (let i = 0; i < Player._queue.length; i++) {
+                response += `\n${i}: ${Player._queue[i].name}`;
+            }
         }
         return response;
     }
@@ -152,6 +158,7 @@ export class Player {
             playLogger.warn(`Not playing video "${video.name}" because the player was already playing audio`);
             return;
         }
+        Player.playing = video.name;
         const audioStream = stream(video);
         const audioResource = createAudioResource(audioStream);
         // Delay may or may not help it start playing w/o audio issues
@@ -165,6 +172,7 @@ export class Player {
             return;
         }
         // Only stop playback of current video then move on to play popped song
+        Player.playing = "";
         Player._audioPlayer.stop();
         playLogger.info(`Skipped song, next song will be played when the audio becomes idle`);
     }
@@ -175,6 +183,7 @@ export class Player {
     static kill() {
         try {
             playLogger.info('Stopping the player');
+            Player.playing = "";
             Player._audioPlayer.stop(true);
             Player.clearQueue();
             if (Player._connection) {
