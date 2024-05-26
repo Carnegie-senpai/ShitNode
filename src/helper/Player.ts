@@ -1,4 +1,4 @@
-import { AudioPlayer, AudioPlayerStatus, VoiceConnection, createAudioPlayer, createAudioResource, joinVoiceChannel } from "@discordjs/voice";
+import { AudioPlayer, AudioPlayerStatus, VoiceConnection, VoiceConnectionStatus, createAudioPlayer, createAudioResource, joinVoiceChannel } from "@discordjs/voice";
 import { Message } from "discord.js";
 import { CommandUtil } from "../commands/CommandUtil";
 import { Video, getVideo, stream } from "./YoutubeStream";
@@ -53,11 +53,21 @@ export class Player {
         try {
             if (!Player._connection) {
                 const user = User.getUserInVoice(msg);
-                Player._queue = [];
+                // Clear playing and queue on startup just in case they managed to remain from a previous session
+                // Even when they should not have 
+                Player.clearQueue();
+                Player.clearPlaying();
                 Player._connection = joinVoiceChannel({
                     guildId: user.guild.id,
                     channelId: user.vc.id,
                     adapterCreator: user.guild.voiceAdapterCreator
+                });
+
+                // If the bot is ever disconnected we should take care of this gracefully
+                Player._connection.on('stateChange', (oldState, newState) => {
+                    if (oldState.status !== VoiceConnectionStatus.Destroyed && oldState.status !== VoiceConnectionStatus.Disconnected && (newState.status === VoiceConnectionStatus.Destroyed || newState.status === VoiceConnectionStatus.Disconnected)) {
+                        Player.kill();
+                    }
                 });
 
                 if (!Player._connection.subscribe(Player._audioPlayer)) {
@@ -136,12 +146,15 @@ export class Player {
      * Prints the contents of the queue as a human readable string. If the queue length
      */
     static printQueue(): string {
+        if (!Player.playing && Player._queue.length === 0)
+            return "  ===> Not Playing Anything <===   ";
+
         let response = "";
-        if (Player.playing != "") {
-            response += `  ===> Currently Playing <===  \n"${Player.playing}"\n`
+        if (Player.playing) {
+            response += `  ===> Currently Playing <===  \n"${Player.playing}"\n`;
         }
         if (Player._queue.length > 0) {
-            response = "  ===> Queue <===  ";
+            response += "  ===> Queue <===  ";
             for (let i = 0; i < Player._queue.length; i++) {
                 response += `\n${i}: ${Player._queue[i].name}`;
             }
@@ -183,9 +196,9 @@ export class Player {
     static kill() {
         try {
             playLogger.info('Stopping the player');
-            Player.playing = "";
-            Player._audioPlayer.stop(true);
+            Player.clearPlaying();
             Player.clearQueue();
+            Player._audioPlayer.stop(true);
             if (Player._connection) {
                 Player._connection.disconnect();
                 Player._connection.destroy();
@@ -194,6 +207,7 @@ export class Player {
         } catch (e) {
             playLogger.error("Encountered an error stopping player, trying to perform at least basic state cleanup");
             Player._queue = [];
+            Player.playing = "";
             const tempConnection = Player._connection;
             Player._connection = undefined;
             tempConnection?.destroy();
@@ -214,5 +228,9 @@ export class Player {
      */
     private static clearQueue() {
         Player._queue = [];
+    }
+
+    private static clearPlaying() {
+        Player.playing = "";
     }
 }
