@@ -39,7 +39,11 @@ If the bot is failing to start ensure the token is created and valid
 mkdir assets && touch assets/token
 ```
 2. Use valid bot-token from [discord](https://discord.com/developers/applications) and paste it into the token file
-3. Run the setup script k8s
+3. If it is your first time setting up the environment setup k8s to be able to pull from docker w/ this script
+```bash
+cd deployment && ./create-image-secret.sh
+```
+4. Run the setup script k8s
 ```bash
 cd deployment && ./create-deployment.sh
 ```

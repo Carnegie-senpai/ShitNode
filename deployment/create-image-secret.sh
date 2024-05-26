@@ -15,4 +15,4 @@ if [ "$passvar" == "" ]; then
     echo no password provided
     exit 1
 fi  
-kubectl create secret docker-registry regcred --docker-server=docker.io --docker-username=$uservar --docker-password=$passvar --docker-email=$uservar
+sudo kubectl create secret docker-registry regcred --docker-server=docker.io --docker-username=$uservar --docker-password=$passvar --docker-email=$uservar
