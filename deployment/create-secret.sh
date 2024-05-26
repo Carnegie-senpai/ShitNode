@@ -1,6 +1,6 @@
 #!/bin/bash
 if sudo kubectl get secrets | grep discord-token; then
-    echo test
+    echo Secret already exists, not attempting to create a new one
     exit 0
 fi
 
