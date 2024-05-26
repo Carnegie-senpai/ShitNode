@@ -26,7 +26,7 @@ mkdir assets && touch assets/token
  - token file w/ valid token in assets directory
 Run the following command to produce an image:
 ```bash
-podman build -t shit-chan -f ./shit-chan.dockerfile
+podman build -t docker.io/USERNAME_HERE/shit-chan:X.X.X -f ./shit-chan.dockerfile
 ```
 ## Troubleshooting
 If build is failing though it seems it shouldn't you can try building w/o a cache by adding the `--no-cache` flag to ensure that it is a fresh build and a stale cash of one of the layers is not causing an issue
