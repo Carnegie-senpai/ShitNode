@@ -16,6 +16,11 @@ const messageLog = new Logger("index/message");
 const shutdownLog = new Logger("index/shutdown");
 
 export async function startup() {
+	var fs = require('fs');
+
+	if (!fs.existsSync('assets')) {
+		fs.mkdirSync('assets');
+	}
 	require('dotenv').config();
 	const token = process?.env?.TOKEN;
 	if (!token) {
