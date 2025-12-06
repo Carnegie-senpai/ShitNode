@@ -1,12 +1,15 @@
 import { readFileSync, writeFileSync } from "fs";
 import moment from "moment";
 import { Logger } from "../Logger";
+import { User } from "discord.js";
 
 const leaderboardLog = new Logger("Leaderboard/Leaderboard");
 export class Leaderboard {
 	private static cache: { [name: string]: number; } = {};
 	static hasReacted = false;
 	static checkpoint: moment.Moment = moment();
+	static lastReactTimeStamp: { user: User | undefined, timestamp: bigint } = { user: undefined, timestamp: process.hrtime.bigint() }
+	static postMessageCB: NodeJS.Timeout
 	static load() {
 		let json: { [name: string]: number; };
 		try {

@@ -5,6 +5,8 @@ import { Leaderboard } from "./helper/Leaderboard";
 import { StaticClient } from "./Client";
 import { Logger } from "./Logger";
 import { ScheduledJobCreator } from "./helper/ScheduledJobCreator";
+import { GENERAL_CHANNEL_ID, OWNER_ID } from "./consts";
+import { ChannelType } from "discord.js";
 
 
 // Define loggers used in index
@@ -30,6 +32,18 @@ export async function startup() {
 
 	Leaderboard.load();
 
+	async function sendGeneralMessage(msg: string) {
+		try {
+			const channel = StaticClient.client.channels.cache.get(GENERAL_CHANNEL_ID);
+			if (channel?.type == ChannelType.GuildText) {
+				return await channel.send(msg)
+			}
+			throw new Error("Was not able to find channel to send message")
+		} catch (e) {
+			messageLog.error("Failed to send a message", e)
+		}
+	}
+
 	StaticClient.client.on('ready', () => {
 		startupLog.info(`Logged in as ${StaticClient.client?.user?.tag}!`);
 
@@ -43,12 +57,9 @@ export async function startup() {
 	rule.minute = 20;
 	ScheduledJobCreator.scheduleJob("blaze", rule, async () => {
 		scheduledLog.info("4:20 am scheduled blaze-it called");
-		const channel = StaticClient.client.channels.cache.get("236745934128676865");
-		if (channel?.isTextBased()) {
-			Leaderboard.hasReacted = false;
-			const message = await channel.send("Blaze it");
-			await message.react("🔥");
-		}
+		Leaderboard.hasReacted = false;
+		const message = await sendGeneralMessage("Blaze it");
+		await message?.react("🔥");
 	});
 
 	// message at 4:20 pm
@@ -57,12 +68,9 @@ export async function startup() {
 	rule2.minute = 20;
 	ScheduledJobCreator.scheduleJob("blaze2", rule2, async () => {
 		scheduledLog.info("4:20 pm scheduled blaze-it called");
-		const channel = StaticClient.client.channels.cache.get("236745934128676865");
-		if (channel?.isTextBased()) {
-			Leaderboard.hasReacted = false;
-			const message = await channel.send("Blaze it");
-			await message.react("🔥");
-		}
+		Leaderboard.hasReacted = false;
+		const message = await sendGeneralMessage("Blaze it");
+		await message?.react("🔥");
 	});
 
 	const rule3 = new RecurrenceRule();
@@ -73,12 +81,9 @@ export async function startup() {
 		if (Leaderboard.isNewMonth()) {
 			try {
 				const winner = Leaderboard.getFirst();
-				const channel = StaticClient.client.channels.cache.get("236745934128676865");
-				if (channel?.isTextBased()) {
-					if (winner) {
-						await channel.send(`Congratulations to ${winner?.name} they won the blaze-it race this month with a final score of ${winner?.score}`);
-						await channel.send(Leaderboard.stringify());
-					}
+				if (winner) {
+					await sendGeneralMessage(`Congratulations to ${winner?.name} they won the blaze-it race this month with a final score of ${winner?.score}`);
+					await sendGeneralMessage(Leaderboard.stringify());
 				}
 			}
 			catch (e) {
@@ -106,11 +111,21 @@ export async function startup() {
 			reaction.message.author?.id === StaticClient.client.user?.id && // Message being reacted to is shit-chan's
 			reaction.message.content === "Blaze it" && // Message text it Blaze it
 			reaction.emoji.name === "🔥" && // Emoji is 🔥
-			!user.bot && // User is not a bot
-			!Leaderboard.hasReacted // User is first
+			!user.bot // User is not a bot
 		) {
-			if (user.username) {
-				Leaderboard.givePoint(user.username);
+			const timeDiff = process.hrtime.bigint() - Leaderboard.lastReactTimeStamp[1]
+			if (!Leaderboard.hasReacted) {
+				if (user.username) {
+					Leaderboard.givePoint(user.username);
+					Leaderboard.lastReactTimeStamp = { user, timestamp: process.hrtime.bigint() }
+					Leaderboard.postMessageCB = setTimeout(async () => {
+						await sendGeneralMessage(`${user.username} got the point`)
+					}, 1100)
+				}
+			} else if (timeDiff < 1e9) {
+				clearTimeout(Leaderboard.postMessageCB)
+				const timeStr = timeDiff < 1e6 ? `${(timeDiff / BigInt(1e3)).toString()}µs` : `${(timeDiff / BigInt(1e6)).toString()}ms`
+				await sendGeneralMessage(`${user.username} lost to ${Leaderboard.lastReactTimeStamp.user?.username} by ${timeStr}`)
 			}
 
 		}
@@ -119,7 +134,7 @@ export async function startup() {
 	StaticClient.client.on("messageCreate", async (message) => {
 		messageLog.info(`Handling message: ${message?.author?.tag}: "${message?.content}"`);
 		// Special shutdown handling to allow cancellation of jobs
-		if (message.content === "uwu shutdown" && message.author.id === "236949806386380801") {
+		if (message.content === "uwu shutdown" && message.author.id === OWNER_ID) {
 			messageLog.info("Received shutdown command");
 			await gracefulShutdown();
 			return;

@@ -3,16 +3,16 @@ Shit-chan is a bot that provides a few functionality, mostly comedic. It is buil
 
 ## Local dev setup
 ### Prequisites:
-- Node v20
-- npm
+- Node v25
+- pnpm
 
 1. Install all dependencies
 ```bash
-npm install
+pnpm install --frozen-lockfile
 ```
 2. Build typescript -> javascript 
 ```bash
-npm run build
+pnpm run build
 ```
 3. Create token file
 ```bash
