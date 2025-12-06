@@ -45,5 +45,5 @@ cd deployment && ./create-image-secret.sh
 ```
 4. Run the setup script k8s
 ```bash
-cd deployment && ./create-deployment.sh
+cd deployment && ./create-deployment.sh /path/to/token
 ```

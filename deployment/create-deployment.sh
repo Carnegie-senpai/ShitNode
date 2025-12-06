@@ -11,8 +11,8 @@ if [ ! -f "./shit-chan.yaml" ]; then
 	exit 1
 fi
 
-if [ ! -f "../assets/token" ]; then
-    echo "The token file was not in ../assets/token as expected"
+if [ ! -f "$1" ]; then
+    echo "The token file was not in $1 as expected"
     exit 1
 fi
 
@@ -28,7 +28,7 @@ if [ `type -t kubectl`"" == "" ]; then
 	exit 1
 fi
 
-token=`cat ../assets/token`
+token=`cat $1`
 
 # All pre-req checks are finished, can now begin running real commands
 echo "Creating secrets"
