@@ -21,7 +21,7 @@ spec:
       - name: shit-chan-container
         image:  grimblo/shit-chan:1.0.8
         volumeMounts:
-        - mountPath: assets
+        - mountPath: /ShitNode/assets
           name: assets
         resources:
           requests:
