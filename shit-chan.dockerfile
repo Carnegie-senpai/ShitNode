@@ -17,4 +17,4 @@ RUN apk add --no-cache ffmpeg
 RUN pnpm run build
 
 # Entry point for container 
-CMD [ "node", "-e", "'require(\"./lib/index.js\").startup()'" ]
+CMD [ "pnpm", "run", "start" ]
