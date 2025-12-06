@@ -6,7 +6,7 @@ COPY ./ /ShitNode
 WORKDIR /ShitNode 
 RUN mkdir assets
 # Install all dependencies
-RUN npm -g corepack
+RUN npm -g --force i corepack
 RUN corepack enable
 RUN pnpm install --frozen-lockfile
 RUN apk update
