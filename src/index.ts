@@ -113,7 +113,7 @@ export async function startup() {
 			reaction.emoji.name === "🔥" && // Emoji is 🔥
 			!user.bot // User is not a bot
 		) {
-			const timeDiff = process.hrtime.bigint() - Leaderboard.lastReactTimeStamp[1]
+			const timeDiff = process.hrtime.bigint() - Leaderboard.lastReactTimeStamp.timestamp
 			if (!Leaderboard.hasReacted) {
 				if (user.username) {
 					Leaderboard.givePoint(user.username);
