@@ -19,7 +19,7 @@ spec:
           type: Directory
       containers:
       - name: shit-chan-container
-        image:  grimblo/shit-chan:1.0.9
+        image:  grimblo/shit-chan:1.0.10
         volumeMounts:
         - mountPath: /ShitNode/assets
           name: assets
@@ -37,6 +37,6 @@ spec:
           - name: TZ
             value: America/Los_Angeles
           - name: RACETIME
-            value: 5000
+            value: "5000"
       imagePullSecrets:
         - name: regcred 
