@@ -36,5 +36,7 @@ spec:
                 key: token
           - name: TZ
             value: America/Los_Angeles
+          - name: RACETIME
+            value: 5000
       imagePullSecrets:
         - name: regcred 

@@ -29,6 +29,7 @@ export async function startup() {
 		startupLog.error("Token not present at startup");
 		throw new Error("Token not present at startup");
 	}
+	const racetime = process.env.RACETIME ? Number(process.env.RACETIME) : 1000
 
 	Leaderboard.load();
 
@@ -106,7 +107,6 @@ export async function startup() {
 	});
 
 	StaticClient.client.on("messageReactionAdd", async (reaction, user) => {
-		reactionLog.info("Handling a reaction");
 		if (
 			reaction.message.author?.id === StaticClient.client.user?.id && // Message being reacted to is shit-chan's
 			reaction.message.content === "Blaze it" && // Message text it Blaze it
@@ -114,6 +114,7 @@ export async function startup() {
 			!user.bot // User is not a bot
 		) {
 			const timeDiff = process.hrtime.bigint() - Leaderboard.lastReactTimeStamp.timestamp
+			reactionLog.info(`Handling a reaction: ${user.username}`);
 			if (!Leaderboard.hasReacted) {
 				if (user.username) {
 					Leaderboard.givePoint(user.username);
@@ -122,12 +123,14 @@ export async function startup() {
 						await sendGeneralMessage(`${user.username} got the point`)
 					}, 1100)
 				}
-			} else if (timeDiff < 1e9) {
+				reactionLog.info('Reaction was first')
+			} else if (timeDiff < (racetime * 1e6)) {
 				clearTimeout(Leaderboard.postMessageCB)
 				const timeStr = timeDiff < 1e6 ? `${(timeDiff / BigInt(1e3)).toString()}µs` : `${(timeDiff / BigInt(1e6)).toString()}ms`
 				await sendGeneralMessage(`${user.username} lost to ${Leaderboard.lastReactTimeStamp.user?.username} by ${timeStr}`)
+				reactionLog.info('Reaction was quick')
 			}
-
+			reactionLog.info("Finished handling reaction")
 		}
 	});
 
